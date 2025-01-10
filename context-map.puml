@@ -1,0 +1,111 @@
+@startuml
+hide empty members
+hide <<Entity>> circle
+hide <<Value Object>> circle
+hide <<Factory>> circle
+hide <<Service>> circle
+hide <<Domain Event>> circle
+hide <<Aggregate Root>> circle
+hide <<Repository>> circle
+
+package Subjekt {
+    package SuiteAggregate  {
+        class Suite <<Aggregate Root>>
+
+        Suite "1" o-- "n" Subject
+        Suite "1" *-- "1" Configuration
+
+        class Subject <<Entity>>
+        class Configuration <<Value Object>>
+    }
+
+    class sourceSubjekt as "Source" <<Value Object>>
+    class SuiteFactory <<Factory>>
+    SuiteFactory ..> Suite : "produces"
+    SuiteFactory ..> sourceSubjekt : "handles"
+
+    package ContextAggregate {
+        class Context <<Aggregate Root>>
+
+        Context "1" o-- "n" DefinedParameter
+        Context "1" o-- "n" DefinedMacro
+
+        class DefinedParameter <<Value Object>>
+        class DefinedMacro <<Value Object>>
+    }
+
+    package ModuleAggregate {
+        class Module <<Aggregate Root>>
+
+        Module "1" o-- "n" Parameter
+        Module "1" o-- "n" Macro
+
+        class Parameter <<Entity>>
+        class Macro <<Entity>>
+    }
+
+    Module <|-- Suite
+
+    package ResolvedSuiteAggregate {
+        class ResolvedSuite <<Aggregate Root>>
+
+        ResolvedSuite "1" *-- "n" ResolvedSubject
+        class ResolvedSubject <<Value Object>>
+    }
+
+    Subject "1" *-- "n" Resolvable
+    Resolvable "1" *-- "n" Instance
+    ResolvedSubject "1" *-- "n" Instance
+
+    class Resolvable <<Entity>>
+    class Instance <<Value Object>>
+
+    class Exporter <<Service>>
+    class resultSubjekt as "Result" <<Value Object>>
+
+    class Mapper <<Service>>
+
+    Mapper ..> ResolvedSuite : "converts"
+    Exporter ..> ResolvedSuite : "exports"
+    Exporter ..> resultSubjekt : "produces"
+}
+
+package API {
+    class User <<Entity>>
+    class sourceApi as "Source" <<Value Object>>
+
+    sourceSubjekt <.> sourceApi
+    resultSubjekt <..> resultApi
+
+    class resultApi as "Result" <<Value Object>>
+    class UserRegistry <<Repository>>
+
+    UserRegistry "1" o-- "n" User : "contains"
+
+    class SourceRegistry <<Repository>>
+
+    SourceRegistry "1" o-- "n" sourceApi : "contains"
+
+    class AuthenticationService <<Service>>
+
+    AuthenticationService ..> UserEvent : "handles"
+    UserEvent ..> User : "uses"
+    AuthenticationService ..> UserRegistry : "updates"
+
+    class SourceService <<Service>>
+
+    SourceService ..> SourceEvent : "handles"
+    SourceService ..> SourceRegistry : "updates"
+
+    class GenerationService <<Service>>
+
+    GenerationService ..> GenerationEvent : "handles"
+    GenerationEvent ..> sourceApi : "uses"
+    GenerationService ...> resultApi: "presents"
+
+    class UserEvent <<Domain Event>>
+    class SourceEvent <<Domain Event>>
+    class GenerationEvent <<Domain Event>>
+}
+
+@enduml

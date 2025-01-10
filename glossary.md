@@ -20,7 +20,7 @@ a Context).
 - **Configuration**: a set of values that can be used to configure the generation.
 
 - **Exporter**: a domain entity which converts a ResolvedSuite into a given format.
-- **Result**: a domain entity that represents the result produced by an Exporter.
+- **Result**: a domain object that represents the result produced by an Exporter.
 - **Source**: a domain object that provides all the Suite's data.
 - **SuiteFactory**: a domain entity that creates a Suite from a Source.
 - **Module**: a library providing a set of Parameters and DefinedMacros.
@@ -29,15 +29,15 @@ a Context).
 ## API
 
 - **User**: a person who interacts with the API.
-- **Suite**: a configuration object that can be saved and edited.
-- **Result**: an entity that represents the result of the Suite elaboration.
+- **Source**: a configuration object that can be saved and edited.
+- **Result**: an entity that represents the result of the Source elaboration.
 - **UserRegistry**: an entity which manage users' repository.
-- **SuiteRegistry**: an entity which manage suites' repository.
+- **SourceRegistry**: an entity which manage source' repository.
 - **AuthenticationService**: an entity which manage users' authentication.
-- **GenerationService**: an entity which manage the Suite elaboration.
+- **GenerationService**: an entity which manage the Source elaboration.
 - **UserEvent**: an event that is triggered by an action involving the UserRegistry (e.g. registration, login, etc.).
-- **SuiteEvent**: an event that is triggered by an action involving the SuiteRegistry (e.g. creation, update, etc.).
-- **GenerationEvent**: an event that is triggered by a request for a Suite elaboration.
+- **SourceEvent**: an event that is triggered by an action involving the SourceRegistry (e.g. creation, update, etc.).
+- **GenerationEvent**: an event that is triggered by a request for a Source elaboration.
 
 ```plantuml
 @startuml
