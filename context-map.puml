@@ -34,17 +34,21 @@ package Subjekt {
         class DefinedMacro <<Value Object>>
     }
 
-    package ModuleAggregate {
-        class Module <<Aggregate Root>>
+    class Module <<Entity>>
 
-        Module "1" o-- "n" Parameter
-        Module "1" o-- "n" Macro
+    package SymbolTableAggregate {
+
+        class SymbolTable <<Aggregate Root>>
+
+        SymbolTable "1" o-- "n" Parameter
+        SymbolTable "1" o-- "n" Macro
 
         class Parameter <<Entity>>
         class Macro <<Entity>>
     }
 
-    Module <|-- Suite
+    SymbolTable "1" --o "1" Suite
+    SymbolTable "1" -o "1" Module
 
     package ResolvedSuiteAggregate {
         class ResolvedSuite <<Aggregate Root>>
@@ -88,9 +92,11 @@ package API {
 
     class AuthenticationService <<Service>>
 
-    AuthenticationService ..> UserEvent : "handles"
-    UserEvent ..> User : "uses"
+    AuthenticationService ..> AuthenticationEvent : "handles"
+    AuthenticationEvent ..> User : "uses"
     AuthenticationService ..> UserRegistry : "updates"
+    UserEvent ..> User : "uses"
+    AuthenticationService ..> UserEvent : "handles"
 
     class SourceService <<Service>>
 
@@ -103,6 +109,7 @@ package API {
     GenerationEvent ..> sourceApi : "uses"
     GenerationService ...> resultApi: "presents"
 
+    class AuthenticationEvent <<Domain Event>>
     class UserEvent <<Domain Event>>
     class SourceEvent <<Domain Event>>
     class GenerationEvent <<Domain Event>>

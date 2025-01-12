@@ -35,7 +35,8 @@ a Context).
 - **SourceRegistry**: an entity which manage source' repository.
 - **AuthenticationService**: an entity which manage users' authentication.
 - **GenerationService**: an entity which manage the Source elaboration.
-- **UserEvent**: an event that is triggered by an action involving the UserRegistry (e.g. registration, login, etc.).
+- **UserEvent**: an event that is triggered by an action involving the User in UserRegistry (e.g. creation, etc.).
+- **AuthenticationEvent**: an event that is triggered by an action involving Authentication in UserRegistry (e.g. login, logout).
 - **SourceEvent**: an event that is triggered by an action involving the SourceRegistry (e.g. creation, update, etc.).
 - **GenerationEvent**: an event that is triggered by a request for a Source elaboration.
 

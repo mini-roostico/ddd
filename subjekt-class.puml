@@ -1,0 +1,119 @@
+@startuml
+hide empty members
+interface Suite {
+    + suiteId: String
+    + subjects: Collection<Subject>
+    + symbolTable: SymbolTable
+    + configuration: Configuration
+}
+interface Subject {
+    + subjectId: String
+    + resolvables: Map<String, Resolvable>
+}
+interface Parameter {
+    + parameterId: String
+    + values: Collection<String>
+}
+interface Macro {
+    + macroId: String
+    + arguments: Collection<String>
+    + values: Collection<Resolvable>
+}
+interface Configuration {
+    + settings: Map<String, Any>
+}
+interface SuiteFactory {
+    + parseSource(source: Source): Suite
+}
+
+Suite "1" *-- "n" Subject
+Suite *-- Configuration
+Suite o-- SymbolTable
+
+SuiteFactory ..> Source : uses
+SuiteFactory ..> Suite : creates
+
+interface Context {
+    + parameters: Collection<DefinedParameter>
+    + macros: Collection<DefinedMacro>
+}
+
+Context "1" o-- "n" DefinedParameter
+Context "1" o-- "n" DefinedMacro
+
+interface DefinedParameter {
+    + parameterId: String
+    + value: String
+}
+
+interface DefinedMacro {
+    + macroId: String
+    + value: Resolvable
+}
+
+interface SymbolTable {
+    + macros: Collection<Macro>
+    + parameters: Collection<Parameter>
+}
+
+interface Module {
+    + moduleId: String
+    + symbolTable: SymbolTable
+}
+
+Module o-- SymbolTable
+
+SymbolTable "1" o-- "n" Parameter
+SymbolTable "1" o-- "n" Macro
+
+interface ResolvedSuite {
+    + suiteId: String
+    + resolvedSubjects: Collection<ResolvedSubject>
+}
+
+ResolvedSuite "1" *-- "n" ResolvedSubject
+
+interface ResolvedSubject {
+    + parentSubjectId: String
+    + instances: Map<String, Instance>
+}
+
+ResolvedSubject "1" *-- "n" Instance
+Subject "1" *-- "n" Resolvable
+Macro "1" *-- "n" Resolvable
+DefinedMacro "1" *-- "n" Resolvable
+
+interface Resolvable
+interface Instance<T> {
+    + value: T
+}
+
+interface Exporter {
+    + exportAsJson(resolvedSuite: ResolvedSuite): JsonResult
+    + exportAsText(resolvedSuite: ResolvedSuite): TextResult
+}
+
+Exporter ..> JsonResult : "uses"
+Exporter ..> TextResult : "uses"
+Exporter ..> ResolvedSuite : "exports"
+Mapper ..> ResolvedSuite : "converts"
+
+interface Result {
+    + asString(): String
+    + toFiles(path: String): Collection<File>
+}
+class JsonResult
+class TextResult
+
+Result <|-- JsonResult
+Result <|-- TextResult
+
+interface Source
+Source <|-- JsonSource
+Source <|-- YamlSource
+
+interface Mapper {
+    + map(resolvedSuite: ResolvedSuite): ResolvedSuite
+}
+
+@enduml

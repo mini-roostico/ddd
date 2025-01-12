@@ -1,0 +1,105 @@
+@startuml
+hide empty members
+interface User {
+    + username: String
+    + password: String
+}
+interface UserRegistry {
+    + createUser(username: String, password: String): User
+    + readUser(username: String): User
+    + updateUser(username: String, fieldToUpdate: String, newValue: String): User
+    + deleteUser(username: String): User
+}
+
+interface SourceRegistry {
+    + createSource(source: Source): Source
+    + readSource(sourceId: String): Source
+    + updateSource(sourceId: String, newSource: Source): Source
+    + deleteSource(sourceId: String): Source
+}
+
+interface AuthenticationService {
+    + handle(event: AuthenticationEvent): void
+    + handle(event: UserEvent): void
+}
+
+interface SourceService {
+    + handle(event: SourceEvent): void
+}
+
+SourceService ..> SourceEvent : "handles"
+SourceService ..> SourceRegistry : "updates"
+SourceRegistry ..> Source : "contains"
+
+GenerationService ..> SourceRegistry : "uses"
+GenerationService ..> GenerationEvent : "handles"
+
+interface GenerationService {
+    + handle(event: GenerationEvent): void
+}
+
+GenerationService ..> Result : "uses"
+
+enum AuthenticationEventType {
+    LOGIN(username: String, password: String)
+    LOGOUT
+}
+
+interface AuthenticationEvent {
+    + type: AuthenticationEventType
+}
+
+interface UserEvent {
+    + type: UserEventType
+}
+
+enum UserEventType {
+    CREATE(username: String, password: String)
+    READ
+    UPDATE(fieldToUpdate: String, newValue: String)
+    DELETE
+}
+
+AuthenticationEvent ..> AuthenticationEventType : uses
+UserEvent ..> UserEventType : uses
+UserRegistry ..> User : "contains"
+
+interface SourceEvent {
+    + type: SourceEventType
+}
+
+SourceEvent ..> SourceEventType : uses
+
+enum SourceEventType {
+    CREATE(source: Source)
+    READ
+    UPDATE(sourceId: String, fieldToUpdate: String, newValue: String)
+    DELETE
+}
+
+SourceService ..> AuthenticationService : "contacts"
+GenerationService ..> AuthenticationService : "contacts"
+
+interface GenerationEvent {
+    + sourceId: String
+}
+
+interface Result {
+    + asString(): String
+    + toFiles(path: String): Collection<File>
+}
+class JsonResult
+class TextResult
+
+Result <|-- JsonResult
+Result <|-- TextResult
+
+interface Source
+Source <|-- JsonSource
+Source <|-- YamlSource
+
+AuthenticationService ..> AuthenticationEvent : "handles"
+AuthenticationService ..> UserEvent : "handles"
+AuthenticationService ..> UserRegistry : "updates"
+
+@enduml
